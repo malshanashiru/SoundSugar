@@ -66,23 +66,18 @@ async def start(_, message):
 async def help(_, message):
     await send(HELP_TEXT)
 
-
-@app.on_message(filters.command("repo") & filters.chat(sudo_chat_id))
-async def repo(_, message):
-    await send(REPO_TEXT)
-
-
+    
 @app.on_message(filters.command("joinvc") & filters.user(owner_id))
 async def joinvc(_, message):
     global chat_joined
     try:
         if chat_joined:
-            await send("__**Bot Is Already In Voice Chat.**__")
+            await send("__**😊 Bot Is Already In Voice Chat.**__")
             return
         chat_id = message.chat.id
         await vc.start(chat_id)
         chat_joined = True
-        m = await send("__**Joined The Voice Chat.**__")
+        m = await send("__**😎 Joined The Voice Chat.**__")
     except Exception as e:
         print(str(e))
         await send(str(e))
@@ -92,15 +87,15 @@ async def joinvc(_, message):
 async def leavevc(_, message):
     global chat_joined
     if not chat_joined:
-        await send("__**Already Out Of Voice Chat.**__")
+        await send("__**🙄 Already Out Of Voice Chat.**__")
         return
     chat_joined = False
-    m = await send("__**Left The Voice Chat.**__")
+    m = await send("__**😵 Left The Voice Chat.**__")
 
 
 @app.on_message(filters.command("kill") & filters.user(owner_id))
 async def killbot(_, message):
-    await send("__**Killed!__**")
+    await send("__**😈 Killed!__**")
     quit()
 
 
@@ -119,7 +114,7 @@ async def queuer(_, message):
         await send(usage)
         return
     if len(queue) > 0:
-        await send("__**Added To Queue.__**")
+        await send("__**🎶 Added To Queue.__**")
         queue.append({"service": service, "song": song_name,
                       "requested_by": requested_by})
         await play()
@@ -133,10 +128,10 @@ async def queuer(_, message):
 async def skip(_, message):
     global playing
     if len(queue) == 0:
-        m = await send("__**Queue Is Empty, Just Like Your Life.**__")
+        m = await send("__**🤪 Queue Is Empty, Just Like Your Life.**__")
         return
     playing = False
-    m = await send("__**Skipped!**__")
+    m = await send("__**⏭ Skipped!**__")
     await play()
 
 
@@ -150,7 +145,7 @@ async def queue_list(_, message):
             i += 1
         m = await send(text)
     else:
-        m = await send("__**Queue Is Empty, Just Like Your Life.**__")
+        m = await send("__**🤪 Queue Is Empty, Just Like Your Life.**__")
 
 
 # Queue handler
@@ -201,7 +196,7 @@ async def play():
 
 async def deezer(requested_by, query):
     global playing
-    m = await send(f"__**Searching for {query} on Deezer.**__")
+    m = await send(f"__**😇 Searching for {query} on Deezer.**__")
     try:
         songs = await arq.deezer(query, 1)
         title = songs[0].title
@@ -210,18 +205,18 @@ async def deezer(requested_by, query):
         artist = songs[0].artist
         url = songs[0].url
     except:
-        await m.edit("__**Found No Song Matching Your Query.**__")
+        await m.edit("__**🧐 Found No Song Matching Your Query.**__")
         playing = False
         return
-    await m.edit("__**Generating Thumbnail.**__")
+    await m.edit("__**🤩 Generating Thumbnail.**__")
     await generate_cover_square(requested_by, title, artist, duration, thumbnail)
-    await m.edit("__**Downloading And Transcoding.**__")
+    await m.edit("__**🤗 Downloading And Transcoding.**__")
     await download_and_transcode_song(url)
     await m.delete()
     m = await app.send_photo(
         chat_id=sudo_chat_id,
         photo="final.png",
-        caption=f"**Playing** __**[{title}]({url})**__ **Via Deezer.**",
+        caption=f"**😍 Playing** __**[{title}]({url})**__ **Via Deezer.**",
     )
     os.remove("final.png")
     await asyncio.sleep(int(songs[0]["duration"]))
@@ -234,7 +229,7 @@ async def deezer(requested_by, query):
 
 async def jiosaavn(requested_by, query):
     global playing
-    m = await send(f"__**Searching for {query} on JioSaavn.**__")
+    m = await send(f"__**😇 Searching for {query} on JioSaavn.**__")
     try:
         songs = await arq.saavn(query)
         sname = songs[0].song
@@ -244,20 +239,20 @@ async def jiosaavn(requested_by, query):
         sduration = songs[0].duration
         sduration_converted = convert_seconds(int(sduration))
     except Exception as e:
-        await m.edit("__**Found No Song Matching Your Query.**__")
+        await m.edit("__**🧐 Found No Song Matching Your Query.**__")
         print(str(e))
         playing = False
         return
-    await m.edit("__**Processing Thumbnail.**__")
+    await m.edit("__**🤩 Processing Thumbnail.**__")
     await generate_cover_square(
         requested_by, sname, ssingers, sduration_converted, sthumb
     )
-    await m.edit("__**Downloading And Transcoding.**__")
+    await m.edit("__**🤗 Downloading And Transcoding.**__")
     await download_and_transcode_song(slink)
     await m.delete()
     m = await app.send_photo(
         chat_id=sudo_chat_id,
-        caption=f"**Playing** __**{sname}**__ **Via Jiosaavn.**",
+        caption=f"**😍 Playing** __**{sname}**__ **Via Jiosaavn.**",
         photo="final.png",
     )
     os.remove("final.png")
@@ -272,7 +267,7 @@ async def jiosaavn(requested_by, query):
 async def ytplay(requested_by, query):
     global playing
     ydl_opts = {"format": "bestaudio"}
-    m = await send(f"__**Searching for {query} on YouTube.**__")
+    m = await send(f"__**😇 Searching for {query} on YouTube.**__")
     try:
         results = await arq.youtube(query, 1)
         link = f"https://youtube.com{results[0].url_suffix}"
@@ -280,29 +275,29 @@ async def ytplay(requested_by, query):
         thumbnail = results[0].thumbnails[0]
         duration = results[0].duration
         views = results[0].views
-        if time_to_seconds(duration) >= 172800:
-            await m.edit("__**Bruh! Only songs within 48 hours.**__")
+        if time_to_seconds(duration) >= 180000:
+            await m.edit("__**😅 Don't Fuck Only songs within 50 hours.**__")
             playing = False
             return
     except Exception as e:
-        await m.edit("__**Found No Song Matching Your Query.**__")
+        await m.edit("__**🧐 Found No Song Matching Your Query.**__")
         playing = False
         print(str(e))
         return
-    await m.edit("__**Processing Thumbnail.**__")
+    await m.edit("__**🤩 Processing Thumbnail.**__")
     await generate_cover(requested_by, title, views, duration, thumbnail)
-    await m.edit("__**Downloading Music.**__")
+    await m.edit("__**🤗 Downloading Music.**__")
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info_dict = ydl.extract_info(link, download=False)
         audio_file = ydl.prepare_filename(info_dict)
         ydl.process_info(info_dict)
-    await m.edit("__**Transcoding.**__")
+    await m.edit("__**😊 Transcoding.**__")
     os.rename(audio_file, "audio.webm")
     transcode("audio.webm")
     await m.delete()
     m = await app.send_photo(
         chat_id=sudo_chat_id,
-        caption=f"**Playing** __**[{title}]({link})**__ **Via YouTube.**",
+        caption=f"**😍 Playing** __**[{title}]({link})**__ **Via YouTube.**",
         photo="final.png",
     )
     os.remove("final.png")
@@ -320,29 +315,29 @@ async def ytplay(requested_by, query):
 async def tgplay(_, message):
     global playing
     if len(queue) != 0:
-        await send("__**You Can Only Play Telegram Files After The Queue Gets Finished.**__")
+        await send("__**😁 You Can Only Play Telegram Files After The Queue Gets Finished.**__")
         return
     if not message.reply_to_message:
-        await send("__**Reply to an audio.**__")
+        await send("__**😉 Reply to an audio.**__")
         return
     if message.reply_to_message.audio:
         if int(message.reply_to_message.audio.file_size) >= 1048576000:
-            await send("__**Bruh! Only songs within 1GB.**__")
+            await send("__**😅 Don't Fuck Only songs within 1GB.**__")
             playing = False
             return
         duration = message.reply_to_message.audio.duration
         if not duration:
-            await send("__**Only Songs With Duration Are Supported.**__")
+            await send("__**🥰 Only Songs With Duration Are Supported.**__")
             return
-        m = await send("__**Downloading.**__")
+        m = await send("__**🤗 Downloading.**__")
         song = await message.reply_to_message.download()
-        await m.edit("__**Transcoding.**__")
+        await m.edit("__**😊 Transcoding.**__")
         transcode(song)
-        await m.edit(f"**Playing** __**{message.reply_to_message.link}.**__")
+        await m.edit(f"**😍 Playing** __**{message.reply_to_message.link}.**__")
         await asyncio.sleep(duration)
         playing = False
         return
-    await send("__**Only Audio Files (Not Document) Are Supported.**__")
+    await send("__**🤣 Only Audio Files (Not Document) Are Supported.**__")
 
 
 async def send(text):
@@ -350,7 +345,7 @@ async def send(text):
     return m
 
 
-print("\nBot Starting...\nFor Support Join https://t.me/PatheticProgrammers\n")
+print("\nBot Starting...\nFor Support Join https://t.me/unlimitedworld_TM_group\n")
 
 
 app.run()
